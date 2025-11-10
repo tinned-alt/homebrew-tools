@@ -4,7 +4,7 @@ class ObsidianNotesAgent < Formula
   desc "AI-powered agent for managing Obsidian notes with Claude"
   homepage "https://github.com/tinned-alt/notes-agent"
   url "https://github.com/tinned-alt/notes-agent/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
+  sha256 "a60dc12e32cf3d73da57b5e569bca934b3ddadfdf08a78e6bdb316a0b1d17b66"
   license "MIT"
 
   depends_on "python@3.12"
