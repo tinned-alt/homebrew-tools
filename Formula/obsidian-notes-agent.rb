@@ -13,18 +13,21 @@ class ObsidianNotesAgent < Formula
     # Create venv
     venv = virtualenv_create(libexec, "python3.12")
     
-    # Install using system pip (since venv uses --system-site-packages)
+    # Install package and dependencies to target directory
+    site_packages = libexec/"lib/python3.12/site-packages"
+    
     system Formula["python@3.12"].opt_bin/"python3.12", "-m", "pip", "install", 
-           "--target=#{libexec}/lib/python3.12/site-packages",
+           "--target=#{site_packages}",
            "--no-deps", buildpath
     
-    # Now install dependencies
+    # Install dependencies
     system Formula["python@3.12"].opt_bin/"python3.12", "-m", "pip", "install",
-           "--target=#{libexec}/lib/python3.12/site-packages",
+           "--target=#{site_packages}",
            "-r", buildpath/"requirements.txt"
     
-    # Create wrapper script
-    (bin/"notes").write_env_script(libexec/"bin/notes", PYTHONPATH: "#{libexec}/lib/python3.12/site-packages:$PYTHONPATH")
+    # Create wrapper script - notes is in site-packages/bin
+    (bin/"notes").write_env_script(site_packages/"bin/notes", 
+                                     PYTHONPATH: "#{site_packages}:$PYTHONPATH")
   end
 
   def post_install
