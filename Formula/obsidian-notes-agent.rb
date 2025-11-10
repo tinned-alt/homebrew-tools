@@ -10,13 +10,18 @@ class ObsidianNotesAgent < Formula
   depends_on "python@3.12"
 
   def install
-    # Create isolated virtualenv
-    virtualenv_create(libexec, "python3.12")
+    # Use the standard virtualenv_install_with_resources but pass the source directly
+    # This will create a proper venv with pip and install the package
+    venv = virtualenv_create(libexec, "python3.12")
     
-    # Install the package and all its dependencies
-    system libexec/"bin/pip", "install", "--verbose", buildpath
+    # Bootstrap pip into the venv
+    system libexec/"bin/python", "-m", "ensurepip"
+    system libexec/"bin/pip", "install", "--upgrade", "pip", "setuptools", "wheel"
     
-    # Link the command
+    # Install the package with all dependencies
+    system libexec/"bin/pip", "install", buildpath
+    
+    # Link the notes command
     bin.install_symlink libexec/"bin/notes"
   end
 
@@ -36,9 +41,9 @@ class ObsidianNotesAgent < Formula
          notes config
 
       📖 Usage:
-         notes chat              Interactive chat
-         notes ingest <url>      Import content
-         notes info              View configuration
+         notes chat
+         notes ingest <url>
+         notes info
     EOS
   end
 
