@@ -10,19 +10,21 @@ class ObsidianNotesAgent < Formula
   depends_on "python@3.12"
 
   def install
-    # Use the standard virtualenv_install_with_resources but pass the source directly
-    # This will create a proper venv with pip and install the package
+    # Create venv
     venv = virtualenv_create(libexec, "python3.12")
     
-    # Bootstrap pip into the venv
-    system libexec/"bin/python", "-m", "ensurepip"
-    system libexec/"bin/pip", "install", "--upgrade", "pip", "setuptools", "wheel"
+    # Install using system pip (since venv uses --system-site-packages)
+    system Formula["python@3.12"].opt_bin/"python3.12", "-m", "pip", "install", 
+           "--target=#{libexec}/lib/python3.12/site-packages",
+           "--no-deps", buildpath
     
-    # Install the package with all dependencies
-    system libexec/"bin/pip", "install", buildpath
+    # Now install dependencies
+    system Formula["python@3.12"].opt_bin/"python3.12", "-m", "pip", "install",
+           "--target=#{libexec}/lib/python3.12/site-packages",
+           "-r", buildpath/"requirements.txt"
     
-    # Link the notes command
-    bin.install_symlink libexec/"bin/notes"
+    # Create wrapper script
+    (bin/"notes").write_env_script(libexec/"bin/notes", PYTHONPATH: "#{libexec}/lib/python3.12/site-packages:$PYTHONPATH")
   end
 
   def post_install
@@ -33,10 +35,6 @@ class ObsidianNotesAgent < Formula
 
   def caveats
     <<~EOS
-      ╭──────────────────────────────────────────────────────────╮
-      │  Obsidian Notes Agent installed successfully!            │
-      ╰──────────────────────────────────────────────────────────╯
-
       🔧 First-time setup:
          notes config
 
