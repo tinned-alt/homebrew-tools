@@ -10,7 +10,14 @@ class ObsidianNotesAgent < Formula
   depends_on "python@3.12"
 
   def install
-    virtualenv_install_with_resources
+    # Create isolated virtualenv
+    virtualenv_create(libexec, "python3.12")
+    
+    # Install the package and all its dependencies
+    system libexec/"bin/pip", "install", "--verbose", buildpath
+    
+    # Link the command
+    bin.install_symlink libexec/"bin/notes"
   end
 
   def post_install
